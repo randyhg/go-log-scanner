@@ -73,7 +73,7 @@ func GzippedLogFileReader(logURL string, db *gorm.DB) error {
 				logError := model.Hjm3u8LogErrors{
 					Message:  message,
 					FailedAt: timestamp,
-					Hash:     hash,
+					Hash:     &hash,
 				}
 				db.Create(&logError)
 			}
@@ -97,9 +97,9 @@ func GzippedLogFileReader(logURL string, db *gorm.DB) error {
 				hash := model.Sha256(message)
 				logError := model.Hjm3u8LogErrors{
 					Message:    message,
-					StackTrace: stackTrace,
+					StackTrace: &stackTrace,
 					FailedAt:   timestamp,
-					Hash:       hash,
+					Hash:       &hash,
 				}
 				db.Create(&logError)
 			}

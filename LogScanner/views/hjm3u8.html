@@ -17,7 +17,7 @@
 
     <div class="container pt-5">
         <a href="/"><h2>Error log</h2></a>
-        <table class="table table-striped table-bordered mt-3">
+        <table class="table table-striped table-bordered mt-3" id="myTable" style="max-width: 2000px;">
             <thead>
               <th>No</th>
               <th>Error Message</th>
@@ -26,7 +26,7 @@
               <th>Last failed</th>
               <th>Action</th>
             </thead>
-            <tbody class="" id="myTable"></tbody>
+            <tbody class=""></tbody>
         </table>
     </div>
 
@@ -47,17 +47,17 @@
             success: function(response){
                 var row = ""
                 array = response.data
-                var table = document.getElementById('myTable')
+                // var table = document.getElementById('myTable')
+                var table = $('#myTable').DataTable();
                 for (var i = 0; i <= array.length; i++) {
-                    var row = ` <tr>
-                            <td>${i+1}</td>
-                            <td>${array[i].message}</td>
-                            <td>${array[i].total}</td>
-                            <td>${array[i].file_name}</td>
-                            <td>${array[i].failed_at}</td>
-                            <td><a href="hjm3u8/errors?hash=${array[i].hash}/1" class="btn btn-primary">More</a></td>
-                            </tr>`
-                            table.innerHTML += row
+                    table.row.add([
+                        i + 1,
+                        array[i].message,
+                        array[i].total,
+                        array[i].file_name,
+                        array[i].failed_at,
+                        `<a href="hjm3u8/errors?hash=${array[i].hash}/1" class="btn btn-primary">More</a>`
+                    ]).draw(false);
                 }
             }            
         })

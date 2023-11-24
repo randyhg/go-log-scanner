@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-log-scanner/config"
 	"go-log-scanner/error_log_scanner/chatserver"
+	"go-log-scanner/error_log_scanner/hjadmin"
 	"go-log-scanner/error_log_scanner/hjapi"
 	"go-log-scanner/error_log_scanner/hjappserver"
 	"go-log-scanner/error_log_scanner/hjm3u8"
@@ -42,7 +43,7 @@ func errorLogScanner(cmd *cobra.Command, args []string) {
 	db := util.Master()
 
 	var wg sync.WaitGroup
-	wg.Add(25)
+	wg.Add(28)
 	go multipleUrlScanner("https://log.hjpfef.com/hjapi/hj-api-log-10/", db, &wg)
 	go multipleUrlScanner("https://log.hjpfef.com/hjapi/hj-api-log-11/", db, &wg)
 	go multipleUrlScanner("https://log.hjpfef.com/hjapi/hj-api-log-22/", db, &wg)
@@ -71,8 +72,9 @@ func errorLogScanner(cmd *cobra.Command, args []string) {
 	// =============================================================================
 
 	// hjqueue scanner
-	defaultStart := time.Date(2023, time.November, 22, 0, 0, 0, 0, time.UTC)
-	defaultEnd := time.Date(2023, time.November, 22, 23, 0, 0, 0, time.UTC)
+	yesterday := time.Now().AddDate(0, 0, -1)
+	defaultStart := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, time.UTC)
+	defaultEnd := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 23, 0, 0, 0, time.UTC)
 	baseURL := "https://log.hjpfef.com/hjqueue/"
 	go hjqueue.PatternedLogScanner(baseURL, "other-revenue", defaultStart, defaultEnd, db, &wg)
 	go hjqueue.PatternedLogScanner(baseURL, "topic-buy-stats", defaultStart, defaultEnd, db, &wg)
@@ -82,16 +84,34 @@ func errorLogScanner(cmd *cobra.Command, args []string) {
 	go hjqueue.PatternedLogScanner(baseURL, "video-incr", defaultStart, defaultEnd, db, &wg)
 	go hjqueue.PatternedLogScanner(baseURL, "video-revenue", defaultStart, defaultEnd, db, &wg)
 
+	// =============================================================================
+
+	// hjadmin scanner
+	go hjAdminValidation("https://log.hjpfef.com/hjadmin/2023-11-03.log", db, &wg)
+	go hjAdminValidation("https://log.hjpfef.com/hjadmin/2023-11-17.log", db, &wg)
+	go hjAdminValidation("https://log.hjpfef.com/hjadmin/2023-11-20.log", db, &wg)
 	wg.Wait()
 }
 
 func multipleUrlScanner(directoryURL string, db *gorm.DB, wg *sync.WaitGroup) error {
 	defer wg.Done()
 	if err := scanGzFiles(directoryURL, db); err != nil {
-		milog.Error(err)
+		milog.Errorf("Scan %s error: %s", directoryURL, err)
 		return err
 	}
 	return nil
+}
+
+func hjAdminValidation(directoryURL string, db *gorm.DB, wg *sync.WaitGroup) {
+	defer wg.Done()
+	scanned, err := hjadmin.IsScanned(directoryURL, db)
+	if err != nil {
+		milog.Error(err)
+		return
+	}
+	if !scanned {
+		hjadmin.HjAdminLogScanner(directoryURL, db)
+	}
 }
 
 func scanGzFiles(directoryURL string, db *gorm.DB) error {

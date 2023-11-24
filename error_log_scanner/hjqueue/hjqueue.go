@@ -44,7 +44,7 @@ func PatternedLogScanner(baseURL string, logName string, start time.Time, end ti
 					queueLog := model.QueueLogErrors{
 						Message:  message,
 						FailedAt: timestamp,
-						Hash:     hash,
+						Hash:     &hash,
 					}
 					db.Create(&queueLog)
 					fmt.Println("Successfully input queue log")

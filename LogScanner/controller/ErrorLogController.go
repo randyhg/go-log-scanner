@@ -147,6 +147,31 @@ func (c *errorLogController) GetHjApiAllErrorByHash(ctx iris.Context) {
 	response.OkWithData(results, ctx)
 }
 
+func (c *errorLogController) GetHjAdminErrorList(ctx iris.Context) {
+	results := service.ErrorLogService.GetAll(model.HjAdminErrors{})
+
+	fileNameRegex := regexp.MustCompile(`(\w+\.go):(\d+)`)
+	for i, result := range results {
+		match := fileNameRegex.FindStringSubmatch(result.Message)
+		if len(match) >= 3 {
+			fileName := match[1]
+			lineNumber := match[2]
+			results[i].FileName = fmt.Sprintf("%s:%s", fileName, lineNumber)
+		}
+	}
+
+	response.OkWithData(results, ctx)
+}
+
+func (c *errorLogController) GetHjAdminAllErrorByHash(ctx iris.Context) {
+	page := ctx.Params().GetIntDefault("page", 1)
+	offset := (page - 1) * 10
+	errorHash := ctx.Params().GetString("errorHash")
+	results := service.ErrorLogService.GetAllErrors(model.HjAdminErrors{}, errorHash, offset)
+
+	response.OkWithData(results, ctx)
+}
+
 func (c *errorLogController) GetHjQueueErrorList(ctx iris.Context) {
 	results := service.ErrorLogService.GetAll(model.QueueLogErrors{})
 

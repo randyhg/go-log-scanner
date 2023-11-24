@@ -28,6 +28,13 @@ type HjApiErrors struct {
 	Hash     string `gorm:"hash"`
 }
 
+type HjAdminErrors struct {
+	ID       uint   `gorm:"id"`
+	Message  string `gorm:"message"`
+	FailedAt string `gorm:"failed_at"`
+	Hash     string `gorm:"hash"`
+}
+
 type QueueLogErrors struct {
 	ID       uint   `gorm:"id"`
 	Message  string `gorm:"message"`

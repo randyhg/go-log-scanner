@@ -8,14 +8,20 @@ import (
 )
 
 func RegisterRoutes(app *iris.Application) {
+	tmpl := iris.HTML("./LogScanner/views", ".html")
+	app.RegisterView(tmpl)
+
+	app.Get("/", func(ctx iris.Context) {
+		ctx.View("index")
+	})
+
 	apiHjm3u8(app.Party("/hjm3u8"))
 	apiChatServer(app.Party("/chat_server"))
 	apiHjAppServer(app.Party("/hjapp_server"))
 	apiHjApi(app.Party("/hjapi"))
 	apiHjQueue(app.Party("/hjqueue"))
+	apiHjAdmin(app.Party("/hjadmin"))
 
-	tmpl := iris.HTML("./LogScanner/views", ".html")
-	app.RegisterView(tmpl)
 }
 
 func apiHjm3u8(router router.Party) {
@@ -71,4 +77,15 @@ func apiHjQueue(router router.Party) {
 	})
 	router.Get("/api/list", controller.ErrorLogController.GetHjQueueErrorList)
 	router.Get("/api/{errorHash}/{page}", controller.ErrorLogController.GetHjQueueAllErrorByHash)
+}
+
+func apiHjAdmin(router router.Party) {
+	router.Get("/", func(ctx iris.Context) {
+		ctx.View("hjadmin")
+	})
+	router.Get("/errors", func(ctx iris.Context) {
+		ctx.View("hjadmin_errors")
+	})
+	router.Get("/api/list", controller.ErrorLogController.GetHjAdminErrorList)
+	router.Get("/api/{errorHash}/{page}", controller.ErrorLogController.GetHjAdminAllErrorByHash)
 }

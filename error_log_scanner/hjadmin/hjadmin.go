@@ -1,11 +1,11 @@
-package hjapi
+package hjadmin
 
 import (
 	"bufio"
-	"compress/gzip"
 	"errors"
 	"fmt"
 	model "go-log-scanner/error_log_scanner/log_model"
+	"log"
 	"net/http"
 	"strings"
 
@@ -13,16 +13,16 @@ import (
 )
 
 func IsScanned(fileName string, db *gorm.DB) (scanned bool, err error) {
-	sql := `CREATE TABLE t_hj_api_scanned_logs (
+	sql := `CREATE TABLE t_hj_admin_scanned_logs (
 		id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 		file_name TEXT NOT NULL, 
 		scanned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`
-	if !db.Migrator().HasTable("t_hj_api_scanned_logs") {
+	if !db.Migrator().HasTable("t_hj_admin_scanned_logs") {
 		db.Exec(sql)
 	}
-	var existing model.HjApiScannedLogs
-	if err := db.Model(model.HjApiScannedLogs{}).Where("file_name = ?", fileName).First(&existing).Error; err != nil {
+	var existing model.HjAdminScannedLogs
+	if err := db.Model(model.HjAdminScannedLogs{}).Where("file_name = ?", fileName).First(&existing).Error; err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			fmt.Println("Error querying database:", err)
 			return false, err
@@ -31,7 +31,7 @@ func IsScanned(fileName string, db *gorm.DB) (scanned bool, err error) {
 	if existing.FileName != "" {
 		return true, nil
 	}
-	scanned_log := model.HjApiScannedLogs{
+	scanned_log := model.HjAdminScannedLogs{
 		FileName: fileName,
 	}
 	if err := db.Create(&scanned_log).Error; err != nil {
@@ -41,22 +41,16 @@ func IsScanned(fileName string, db *gorm.DB) (scanned bool, err error) {
 	return false, nil
 }
 
-func GzippedLogFileReader(logURL string, db *gorm.DB) error {
-	db.AutoMigrate(&model.HjApiErrors{})
+func HjAdminLogScanner(logURL string, db *gorm.DB) {
+	db.AutoMigrate(&model.HjAdminErrors{})
 	resp, err := http.Get(logURL)
 	if err != nil {
-		return err
+		log.Fatal(err)
+		return
 	}
 	defer resp.Body.Close()
 
-	reader, err := gzip.NewReader(resp.Body)
-	if err != nil {
-		return err
-	}
-	defer reader.Close()
-
-	scanner := bufio.NewScanner(reader)
-
+	scanner := bufio.NewScanner(resp.Body)
 	var stackFlag = false
 	var stackTraces []string
 	var currentTrace strings.Builder
@@ -65,12 +59,12 @@ func GzippedLogFileReader(logURL string, db *gorm.DB) error {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.Contains(line, "error") && !strings.Contains(line, "goroutine") && !stackFlag {
-			message := model.TimestampRegex.ReplaceAllString(line, "")
-			match := model.TimestampRegex.FindStringSubmatch(line)
+			message := model.HjAdminTimestampRegex.ReplaceAllString(line, "")
+			match := model.HjAdminTimestampRegex.FindStringSubmatch(line)
 			if len(match) > 0 {
 				timestamp := match[0]
-				hash := model.Sha256(message)
-				logError := model.HjApiErrors{
+				hash := model.HjAdminSha256(line)
+				logError := model.HjAdminErrors{
 					Message:  message,
 					FailedAt: timestamp,
 					Hash:     &hash,
@@ -81,21 +75,21 @@ func GzippedLogFileReader(logURL string, db *gorm.DB) error {
 			traceHeadMessage = line
 			stackFlag = true
 			currentTrace.WriteString(line + "\n")
-		} else if stackFlag && !model.TimestampRegex.MatchString(line) {
+		} else if stackFlag && !model.HjAdminTimestampRegex.MatchString(line) {
 			currentTrace.WriteString(line + "\n")
-		} else if stackFlag && model.TimestampRegex.MatchString(line) {
+		} else if stackFlag && model.HjAdminTimestampRegex.MatchString(line) {
 			stackFlag = false
 			stackTraces = append(stackTraces, currentTrace.String())
 			index := len(stackTraces)
 			stackTrace := stackTraces[index-1]
 			currentTrace.Reset()
 
-			message := model.TimestampRegex.ReplaceAllString(traceHeadMessage, "")
-			match := model.TimestampRegex.FindStringSubmatch(line)
+			message := model.HjAdminTimestampRegex.ReplaceAllString(traceHeadMessage, "")
+			match := model.HjAdminTimestampRegex.FindStringSubmatch(line)
 			if len(match) > 0 {
 				timestamp := match[0]
-				hash := model.Sha256(message)
-				logError := model.HjApiErrors{
+				hash := model.HjAdminSha256(line)
+				logError := model.HjAdminErrors{
 					Message:    message,
 					StackTrace: &stackTrace,
 					FailedAt:   timestamp,
@@ -107,9 +101,7 @@ func GzippedLogFileReader(logURL string, db *gorm.DB) error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return err
+		return
 	}
-
 	fmt.Println(logURL, "successfully scanned")
-	return nil
 }
