@@ -31,20 +31,8 @@ func (c *errorLogService) GetErrorTotalService(hash string, model interface{}) (
 }
 
 func (c *errorLogService) GetErrorMessageService(model interface{}) (string, error) {
-	// if err := util.Master().Model(model).Where("hash = ?", hash).First(&errorLog).Error; err != nil {
-	// 	return "", err
-	// }
-	// return errorLog.Message, nil
 	return "", nil
 }
-
-// func (c *errorLogService) GetErrorMessageService(hash string, db *gorm.DB) (string, error) {
-// 	var errorLog ChatServerLogErrors
-// 	if err := db.Model(ChatServerLogErrors{}).Where("hash = ?", hash).First(&errorLog).Error; err != nil {
-// 		return "", err
-// 	}
-// 	return errorLog.Message, nil
-// }
 
 type Results struct {
 	Message  string `json:"message"`
@@ -61,26 +49,36 @@ func (c *errorLogService) GetAll(model interface{}) []Results {
 }
 
 type ErrorResults struct {
+	Id         int64  `json:"id"`
 	Message    string `gorm:"message" json:"message"`
 	FailedAt   string `gorm:"failed_at" json:"failed_at"`
 	StackTrace string `gorm:"stack_trace" json:"stack_trace"`
 	Hash       string `gorm:"hash" json:"hash"`
 }
 
-// func (c *errorLogService) GetAllErrors(model interface{}, hash string) []ErrorResults {
-// 	var results []ErrorResults
-// 	if err := util.Master().Model(model).Where("hash = ?", hash).Limit(10).Offset(10).Scan(&results).Error; err != nil {
-// 		milog.Error(err)
-// 		return nil
-// 	}
-// 	return results
-// }
-
 func (c *errorLogService) GetAllErrors(model interface{}, hash string, offset int) []ErrorResults {
 	var results []ErrorResults
-	if err := util.Master().Model(model).Where("hash = ?", hash).Order("id DESC").Limit(20).Offset(offset).Scan(&results).Error; err != nil {
+	if err := util.Master().Model(model).Where("hash = ?", hash).Order("id DESC").Scan(&results).Error; err != nil {
+		// if err := util.Master().Model(model).Where("hash = ?", hash).Order("id DESC").Limit(20).Offset(offset).Scan(&results).Error; err != nil {
 		milog.Error(err)
 		return nil
 	}
 	return results
+}
+
+func (c *errorLogService) GetAllErrorsV2(model interface{}, hash string, start int, length int) []ErrorResults {
+	var results []ErrorResults
+	if err := util.Master().Model(model).Where("hash = ?", hash).Order("id DESC").Limit(length).Offset(start).Scan(&results).Error; err != nil {
+		milog.Error(err)
+		return nil
+	}
+	return results
+}
+
+func (c *errorLogService) GetAllErrorsTotalByHash(model interface{}, hash string) (total int64) {
+	if err := util.Master().Model(model).Where("hash = ?", hash).Count(&total).Error; err != nil {
+		milog.Error(err)
+		return 0
+	}
+	return total
 }

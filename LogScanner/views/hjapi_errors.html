@@ -1,40 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All errors</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
-</head>
-<body>
+{{  template "header.html"}}
     <div class="container pt-5">
-        <a href="/"><h2>Error log</h2></a>
-        <table class="table table-striped table-bordered mt-3">
+        <h2>{{ .Title }}</h2>
+        <table class="table table-striped table-bordered mt-3" id="myTable">
             <thead>
+              <th>Id</th>
               <th>Error Message</th>
               <th>Stack trace</th>
               <th>Failed at</th>
             </thead>
-            <tbody class="" id="myTable"></tbody>
+            <tbody class=""></tbody>
         </table>
     </div>
-
-    <!-- <div class="pagination">
-        <ul>
-            <li>
-                <a href="/errors?hash=${array[i].hash}/{{ .pagination.PreviousPage }}">Previous</a>
-            </li>
-            <li>
-                <a href="/{{ .path }}/{{ .pagination.NextPage }}">Next</a>
-            </li>
-        </ul>
-    </div> -->
+    {{  template "footer.html"}}
 </body>
 </html>
 
@@ -51,25 +28,21 @@
         var pathArray = currentURL.split('/');
         var page = pathArray[pathArray.length - 1];
         var endpoint = 'http://127.0.0.1:8889/hjapi/api/' + errorHash;
-        // console.log(page, "====++++++++")
-        // console.log(endpoint, "================================");
-        $.ajax ({
-            method: 'GET',
-            url: endpoint,
-            success: function(response){
-                    var array = response.data;
-                    var table = document.getElementById('myTable')
-                    for (var i = 0; i <= array.length; i++) {
-                        var row = ` <tr>
-                                        <td>${array[i].message}</td>
-                                        <td>${array[i].stack_trace}</td>
-                                        <td>${array[i].failed_at}</td>
-                                    </tr>`
-
-                        table.innerHTML += row;
-                    }
-                }  
-        })
+        $('#myTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": endpoint,
+                "type": "GET",
+                "dataSrc": "data"
+            },
+            "columns": [
+                { "data": "id"},
+                { "data": "message" },
+                { "data": "stack_trace" },
+                { "data": "failed_at" }
+            ]
+        });
     })
     
 </script>

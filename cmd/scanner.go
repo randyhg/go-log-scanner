@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"go-log-scanner/config"
 	"go-log-scanner/error_log_scanner/chatserver"
@@ -11,7 +12,9 @@ import (
 	"go-log-scanner/error_log_scanner/hjqueue"
 	"go-log-scanner/util"
 	milog "hj_common/log"
+	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 	"sync"
@@ -40,8 +43,22 @@ func init() {
 func errorLogScanner(cmd *cobra.Command, args []string) {
 	config.Init()
 	util.Init()
-	db := util.Master()
 
+	if len(args) == 0 {
+		scanAllLogs(util.Master())
+	} else if len(args) == 1 {
+		logUrl := args[0]
+		singleLogScanner(logUrl, util.Master())
+		fmt.Println("Log printed to /scanned_logs/")
+	} else if len(args) == 2 {
+		logUrl := args[1]
+		if err := singleGzLogScanner(logUrl, util.Master()); err != nil {
+			milog.Error(err)
+		}
+	}
+}
+
+func scanAllLogs(db *gorm.DB) {
 	var wg sync.WaitGroup
 	wg.Add(28)
 	go multipleUrlScanner("https://log.hjpfef.com/hjapi/hj-api-log-10/", db, &wg)
@@ -90,6 +107,7 @@ func errorLogScanner(cmd *cobra.Command, args []string) {
 	go hjAdminValidation("https://log.hjpfef.com/hjadmin/2023-11-03.log", db, &wg)
 	go hjAdminValidation("https://log.hjpfef.com/hjadmin/2023-11-17.log", db, &wg)
 	go hjAdminValidation("https://log.hjpfef.com/hjadmin/2023-11-20.log", db, &wg)
+
 	wg.Wait()
 }
 
@@ -98,6 +116,96 @@ func multipleUrlScanner(directoryURL string, db *gorm.DB, wg *sync.WaitGroup) er
 	if err := scanGzFiles(directoryURL, db); err != nil {
 		milog.Errorf("Scan %s error: %s", directoryURL, err)
 		return err
+	}
+	return nil
+}
+
+func singleLogScanner(logUrl string, db *gorm.DB) {
+	resp, err := http.Get(logUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	file, err := os.Create("scanned_logs/scanned.log")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	log.SetOutput(file)
+
+	scanner := bufio.NewScanner(resp.Body)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, "error") {
+			log.Print(line)
+		}
+	}
+}
+
+func singleGzLogScanner(logUrl string, db *gorm.DB) error {
+	if chatServerRegex.MatchString(logUrl) {
+		scanned, err := chatserver.IsScanned(logUrl, db)
+		if err != nil {
+			fmt.Println("Error processing file:", err)
+			return err
+		}
+		if scanned {
+			err := fmt.Errorf("%s has been scanned", logUrl)
+			return err
+		} else {
+			if err := chatserver.GzippedLogFileReader(logUrl, db); err != nil {
+				fmt.Println("Error creating record in database:", err)
+				return err
+			}
+		}
+	} else if hjAppServerRegex.MatchString(logUrl) {
+		scanned, err := hjappserver.IsScanned(logUrl, db)
+		if err != nil {
+			fmt.Println("Error processing file:", err)
+			return err
+		}
+		if scanned {
+			err := fmt.Errorf("%s has been scanned", logUrl)
+			return err
+		} else {
+			if err := hjappserver.GzippedLogFileReader(logUrl, db); err != nil {
+				fmt.Println("Error creating record in database:", err)
+				return err
+			}
+		}
+	} else if hjm3u8Regex.MatchString(logUrl) {
+		scanned, err := hjm3u8.IsScanned(logUrl, db)
+		if err != nil {
+			fmt.Println("Error processing file:", err)
+			return err
+		}
+		if scanned {
+			err := fmt.Errorf("%s has been scanned", logUrl)
+			return err
+		} else {
+			if err := hjm3u8.GzippedLogFileReader(logUrl, db); err != nil {
+				fmt.Println("Error creating record in database:", err)
+				return err
+			}
+		}
+	} else if hjapiRegex.MatchString(logUrl) {
+		scanned, err := hjapi.IsScanned(logUrl, db)
+		if err != nil {
+			fmt.Println("Error processing file:", err)
+			return err
+		}
+		if scanned {
+			err := fmt.Errorf("%s has been scanned", logUrl)
+			return err
+		} else {
+			if err := hjapi.GzippedLogFileReader(logUrl, db); err != nil {
+				fmt.Println("Error creating record in database:", err)
+				return err
+			}
+		}
 	}
 	return nil
 }

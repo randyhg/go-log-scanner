@@ -6,6 +6,7 @@ import (
 	"go-log-scanner/LogScanner/response"
 	"go-log-scanner/LogScanner/service"
 	"regexp"
+	"strconv"
 
 	"github.com/kataras/iris/v12"
 )
@@ -16,6 +17,7 @@ type LogErrorResponse struct {
 }
 
 var ErrorLogController = newErrorLogController()
+var fileNameRegex = regexp.MustCompile(`(\w+\.go):(\d+)`)
 
 func newErrorLogController() *errorLogController {
 	return &errorLogController{}
@@ -50,7 +52,6 @@ func Hjm3u8Errors(ctx iris.Context) {
 func (c *errorLogController) GetHjm3u8ErrorList(ctx iris.Context) {
 	results := service.ErrorLogService.GetAll(model.Hjm3u8LogErrors{})
 
-	fileNameRegex := regexp.MustCompile(`(\w+\.go):(\d+)`)
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
 		if len(match) >= 3 {
@@ -60,22 +61,24 @@ func (c *errorLogController) GetHjm3u8ErrorList(ctx iris.Context) {
 		}
 	}
 
-	response.OkWithData(results, ctx)
+	response.OkWithDataV2(results, ctx)
 }
 
 func (c *errorLogController) GetHjm3u8AllErrorByHash(ctx iris.Context) {
-	page := ctx.Params().GetIntDefault("page", 1)
-	offset := (page - 1) * 10
+	draw, _ := strconv.Atoi(ctx.URLParam("draw"))
+	start, _ := strconv.Atoi(ctx.URLParam("start"))
+	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrors(model.Hjm3u8LogErrors{}, errorHash, offset)
+	results := service.ErrorLogService.GetAllErrorsV2(model.Hjm3u8LogErrors{}, errorHash, start, length)
 
-	response.OkWithData(results, ctx)
+	// response.OkWithData(results, ctx)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.Hjm3u8LogErrors{}, errorHash)
+	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetChatServerErrorList(ctx iris.Context) {
 	results := service.ErrorLogService.GetAll(model.ChatServerLogErrors{})
 
-	fileNameRegex := regexp.MustCompile(`(\w+\.go):(\d+)`)
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
 		if len(match) >= 3 {
@@ -85,22 +88,24 @@ func (c *errorLogController) GetChatServerErrorList(ctx iris.Context) {
 		}
 	}
 
-	response.OkWithData(results, ctx)
+	response.OkWithDataV2(results, ctx)
 }
 
 func (c *errorLogController) GetChatServerAllErrorByHash(ctx iris.Context) {
-	page := ctx.Params().GetIntDefault("page", 1)
-	offset := (page - 1) * 10
+	draw, _ := strconv.Atoi(ctx.URLParam("draw"))
+	start, _ := strconv.Atoi(ctx.URLParam("start"))
+	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrors(model.ChatServerLogErrors{}, errorHash, offset)
+	results := service.ErrorLogService.GetAllErrorsV2(model.ChatServerLogErrors{}, errorHash, start, length)
 
-	response.OkWithData(results, ctx)
+	// response.OkWithData(results, ctx)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.ChatServerLogErrors{}, errorHash)
+	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetHjAppServerErrorList(ctx iris.Context) {
 	results := service.ErrorLogService.GetAll(model.HjAppServerErrors{})
 
-	fileNameRegex := regexp.MustCompile(`(\w+\.go):(\d+)`)
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
 		if len(match) >= 3 {
@@ -110,22 +115,24 @@ func (c *errorLogController) GetHjAppServerErrorList(ctx iris.Context) {
 		}
 	}
 
-	response.OkWithData(results, ctx)
+	response.OkWithDataV2(results, ctx)
 }
 
 func (c *errorLogController) GetHjAppServerAllErrorByHash(ctx iris.Context) {
-	page := ctx.Params().GetIntDefault("page", 1)
-	offset := (page - 1) * 10
+	draw, _ := strconv.Atoi(ctx.URLParam("draw"))
+	start, _ := strconv.Atoi(ctx.URLParam("start"))
+	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrors(model.HjAppServerErrors{}, errorHash, offset)
+	results := service.ErrorLogService.GetAllErrorsV2(model.HjAppServerErrors{}, errorHash, start, length)
 
-	response.OkWithData(results, ctx)
+	// response.OkWithData(results, ctx)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.HjAppServerErrors{}, errorHash)
+	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetHjApiErrorList(ctx iris.Context) {
 	results := service.ErrorLogService.GetAll(model.HjApiErrors{})
 
-	fileNameRegex := regexp.MustCompile(`(\w+\.go):(\d+)`)
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
 		if len(match) >= 3 {
@@ -135,22 +142,24 @@ func (c *errorLogController) GetHjApiErrorList(ctx iris.Context) {
 		}
 	}
 
-	response.OkWithData(results, ctx)
+	response.OkWithDataV2(results, ctx)
 }
 
 func (c *errorLogController) GetHjApiAllErrorByHash(ctx iris.Context) {
-	page := ctx.Params().GetIntDefault("page", 1)
-	offset := (page - 1) * 10
+	draw, _ := strconv.Atoi(ctx.URLParam("draw"))
+	start, _ := strconv.Atoi(ctx.URLParam("start"))
+	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrors(model.HjApiErrors{}, errorHash, offset)
+	results := service.ErrorLogService.GetAllErrorsV2(model.HjApiErrors{}, errorHash, start, length)
 
-	response.OkWithData(results, ctx)
+	// response.OkWithData(results, ctx)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.HjApiErrors{}, errorHash)
+	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetHjAdminErrorList(ctx iris.Context) {
 	results := service.ErrorLogService.GetAll(model.HjAdminErrors{})
 
-	fileNameRegex := regexp.MustCompile(`(\w+\.go):(\d+)`)
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
 		if len(match) >= 3 {
@@ -160,22 +169,24 @@ func (c *errorLogController) GetHjAdminErrorList(ctx iris.Context) {
 		}
 	}
 
-	response.OkWithData(results, ctx)
+	response.OkWithDataV2(results, ctx)
 }
 
 func (c *errorLogController) GetHjAdminAllErrorByHash(ctx iris.Context) {
-	page := ctx.Params().GetIntDefault("page", 1)
-	offset := (page - 1) * 10
+	draw, _ := strconv.Atoi(ctx.URLParam("draw"))
+	start, _ := strconv.Atoi(ctx.URLParam("start"))
+	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrors(model.HjAdminErrors{}, errorHash, offset)
+	results := service.ErrorLogService.GetAllErrorsV2(model.HjAdminErrors{}, errorHash, start, length)
 
-	response.OkWithData(results, ctx)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.HjAdminErrors{}, errorHash)
+	// response.OkWithData(results, ctx)
+	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetHjQueueErrorList(ctx iris.Context) {
 	results := service.ErrorLogService.GetAll(model.QueueLogErrors{})
 
-	fileNameRegex := regexp.MustCompile(`(\w+\.go):(\d+)`)
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
 		if len(match) >= 3 {
@@ -185,16 +196,18 @@ func (c *errorLogController) GetHjQueueErrorList(ctx iris.Context) {
 		}
 	}
 
-	response.OkWithData(results, ctx)
+	response.OkWithDataV2(results, ctx)
 }
 
 func (c *errorLogController) GetHjQueueAllErrorByHash(ctx iris.Context) {
-	page := ctx.Params().GetIntDefault("page", 1)
-	offset := (page - 1) * 10
+	draw, _ := strconv.Atoi(ctx.URLParam("draw"))
+	start, _ := strconv.Atoi(ctx.URLParam("start"))
+	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrors(model.QueueLogErrors{}, errorHash, offset)
+	results := service.ErrorLogService.GetAllErrorsV2(model.QueueLogErrors{}, errorHash, start, length)
 
-	response.OkWithData(results, ctx)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.QueueLogErrors{}, errorHash)
+	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 // func (c *errorLogController) GetPagination(ctx iris.Context) {

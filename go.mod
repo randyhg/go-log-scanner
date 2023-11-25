@@ -4,10 +4,10 @@ go 1.17
 
 require (
 	github.com/iris-contrib/middleware/cors v0.0.0-20201012144513-9d3d1026d313
-	github.com/kataras/iris v0.0.2
 	github.com/kataras/iris/v12 v12.2.0-alpha8
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.3.2
+	golang.org/x/net v0.7.0
 	gorm.io/driver/mysql v1.4.7
 	gorm.io/gorm v1.24.5
 	hj_common v0.0.0
@@ -64,7 +64,6 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yosssi/ace v0.0.5 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
-	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
