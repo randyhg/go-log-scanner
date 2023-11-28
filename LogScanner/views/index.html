@@ -1,12 +1,14 @@
-    {{  template "header.html"}}
-    <div class="container py-5">
+<div id="loadingIndicator">
+  <l-quantum size="35" speed="1.8" color="rgb(0, 31, 63)"></l-quantum>
+</div>
+  <div class="container py-5" id="content" style="display: none;">
         <h1>Error Logs</h1>
         <div class="row py-3">
           <div class="col-md-4 mb-4">
             <div class="card shadow-sm">
               <div class="card-body">
                 <h5 class="card-title">Chat Server</h5>
-                <p class="card-text">Chat Server error logs.</p>
+                <p class="card-text"><span id="chatServerTotal"></span> total errors</p>
                 <a href="chat_server" class="btn  btn-primary ho">Go</a>
               </div>
             </div>
@@ -15,7 +17,7 @@
             <div class="card shadow-sm">
               <div class="card-body">
                 <h5 class="card-title">HJ Api</h5>
-                <p class="card-text">HJ Api error logs.</p>
+                <p class="card-text"><span id="hjapiTotal"></span> total errors</p>
                 <a href="hjapi" class="btn  btn-primary ho">Go</a>
               </div>
             </div>
@@ -24,7 +26,7 @@
             <div class="card shadow-sm">
               <div class="card-body">
                 <h5 class="card-title">HJ App Server</h5>
-                <p class="card-text">HJ App Server error logs.</p>
+                <p class="card-text"><span id="hjappServerTotal"></span> total errors</p>
                 <a href="hjapp_server" class="btn  btn-primary ho">Go</a>
               </div>
             </div>
@@ -33,7 +35,7 @@
             <div class="card shadow-sm">
               <div class="card-body">
                 <h5 class="card-title">HJ M3u8</h5>
-                <p class="card-text">HJ M3u8 error logs.</p>
+                <p class="card-text"><span id="hjm3u8Total"></span> total errors</p>
                 <a href="hjm3u8" class="btn  btn-primary ho">Go</a>
               </div>
             </div>
@@ -42,7 +44,7 @@
             <div class="card shadow-sm">
               <div class="card-body">
                 <h5 class="card-title">HJ Admin</h5>
-                <p class="card-text">HJ Admin error logs.</p>
+                <p class="card-text"><span id="hjadminTotal"></span> total errors</p>
                 <a href="hjadmin" class="btn  btn-primary ho">Go</a>
               </div>
             </div>
@@ -51,7 +53,7 @@
             <div class="card shadow-sm">
               <div class="card-body">
                 <h5 class="card-title">HJ Queue</h5>
-                <p class="card-text">HJ Queue error logs.</p>
+                <p class="card-text"><span id="hjqueueTotal"></span> total errors</p>
                 <a href="hjqueue" class="btn  btn-primary ho">Go</a>
               </div>
             </div>
@@ -59,9 +61,65 @@
         </div>
       </div>
     </div>
-    {{  template "footer.html"}}
-</body>
-</html>
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/quantum.js"></script>
+<script>
+  function showLoading() {
+        document.getElementById('loadingIndicator').style.display = 'block';
+        document.getElementById('content').style.display = 'none';
+    }
+
+  function hideLoading() {
+    $('#loadingIndicator').slideUp(300, function() {
+      $('#content').slideDown(300);
+    });
+  }
+</script>
+<script>
+  function fetchData(url, containerId) {
+    showLoading();
+    return $.ajax({
+        method: 'GET',
+        url: url
+    });
+  }
+
+
+  var apiUrls = [
+      'http://127.0.0.1:8889/total/chat_server',
+      'http://127.0.0.1:8889/total/hjadmin',
+      'http://127.0.0.1:8889/total/hjapi',
+      'http://127.0.0.1:8889/total/hjapp_server',
+      'http://127.0.0.1:8889/total/hjm3u8',
+      'http://127.0.0.1:8889/total/hjqueue',
+  ];
+
+  Promise.all(apiUrls.map(url => fetchData(url)))
+  .then(responses => {
+    setTimeout(function() {
+      var chatServer = responses[0].data;
+      var hjadmin = responses[1].data;
+      var hjapi = responses[2].data;
+      var hjappServer = responses[3].data;
+      var hjm3u8 = responses[4].data;
+      var hjqueue = responses[5].data;
+
+      $('#chatServerTotal').html(chatServer)
+      $('#hjadminTotal').html(hjadmin)
+      $('#hjapiTotal').html(hjapi)
+      $('#hjappServerTotal').html(hjappServer)
+      $('#hjm3u8Total').html(hjm3u8)
+      $('#hjqueueTotal').html(hjqueue)
+      hideLoading();
+    }, 2000);
+  })
+  .catch(error => {
+      console.error('Error fetching data:', error);
+      $('#chatServerTotal').html('Error fetching data');
+      $('#hjadminTotal').html('Error fetching data');
+      $('#hjapiTotal').html('Error fetching data');
+      $('#hjappServerTotal').html('Error fetching data');
+      $('#hjm3u8Total').html('Error fetching data');
+      $('#hjqueueTotal').html('Error fetching data');
+  });
+</script>

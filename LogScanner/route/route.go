@@ -12,9 +12,15 @@ func RegisterRoutes(app *iris.Application) {
 	app.RegisterView(tmpl)
 
 	app.Get("/", func(ctx iris.Context) {
+		data := iris.Map{
+			"Title": "HJ Errors Log",
+		}
+		ctx.View("part/header", data)
 		ctx.View("index")
+		ctx.View("part/footer")
 	})
 
+	apiTotal(app.Party("/total"))
 	apiHjm3u8(app.Party("/hjm3u8"))
 	apiChatServer(app.Party("/chat_server"))
 	apiHjAppServer(app.Party("/hjapp_server"))
@@ -24,14 +30,29 @@ func RegisterRoutes(app *iris.Application) {
 
 }
 
+func apiTotal(router router.Party) {
+	router.Get("/chat_server", controller.ErrorLogController.GetChatServerTotalRecord)
+	router.Get("/hjadmin", controller.ErrorLogController.GetHjAdminTotalRecord)
+	router.Get("/hjapi", controller.ErrorLogController.GetHjApiTotalRecord)
+	router.Get("/hjapp_server", controller.ErrorLogController.GetHjAppServerTotalRecord)
+	router.Get("/hjm3u8", controller.ErrorLogController.GetHjM3u8TotalRecord)
+	router.Get("/hjqueue", controller.ErrorLogController.GetHjQueueTotalRecord)
+}
+
 func apiHjm3u8(router router.Party) {
 	data := iris.Map{
 		"Title": "HJ M3u8 Error Log",
 	}
 	router.Get("/", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/table", data)
+		ctx.View("part/footer", data)
 		ctx.View("hjm3u8", data)
 	})
 	router.Get("/errors", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/error_table", data)
+		ctx.View("part/footer", data)
 		ctx.View("hjm3u8_errors", data)
 	})
 	router.Get("/api/list", controller.ErrorLogController.GetHjm3u8ErrorList)
@@ -43,9 +64,15 @@ func apiChatServer(router router.Party) {
 		"Title": "Chat Server Error Log",
 	}
 	router.Get("/", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/table", data)
+		ctx.View("part/footer", data)
 		ctx.View("chat_server", data)
 	})
 	router.Get("/errors", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/error_table", data)
+		ctx.View("part/footer", data)
 		ctx.View("chat_server_errors", data)
 	})
 	router.Get("/api/list", controller.ErrorLogController.GetChatServerErrorList)
@@ -57,9 +84,15 @@ func apiHjAppServer(router router.Party) {
 		"Title": "HJ App Server Error Log",
 	}
 	router.Get("/", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/table", data)
+		ctx.View("part/footer", data)
 		ctx.View("hjapp_server", data)
 	})
 	router.Get("/errors", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/error_table", data)
+		ctx.View("part/footer", data)
 		ctx.View("hjapp_server_errors", data)
 	})
 	router.Get("/api/list", controller.ErrorLogController.GetHjAppServerErrorList)
@@ -71,9 +104,15 @@ func apiHjApi(router router.Party) {
 		"Title": "HJ Api Error Log",
 	}
 	router.Get("/", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/table", data)
+		ctx.View("part/footer", data)
 		ctx.View("hjapi", data)
 	})
 	router.Get("/errors", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/error_table", data)
+		ctx.View("part/footer", data)
 		ctx.View("hjapi_errors", data)
 	})
 	router.Get("/api/list", controller.ErrorLogController.GetHjApiErrorList)
@@ -85,10 +124,14 @@ func apiHjQueue(router router.Party) {
 		"Title": "HJ Queue Error Log",
 	}
 	router.Get("/", func(ctx iris.Context) {
+		ctx.View("part/header", data)
 		ctx.View("hjqueue", data)
+		ctx.View("part/footer", data)
 	})
 	router.Get("/errors", func(ctx iris.Context) {
+		ctx.View("part/header", data)
 		ctx.View("hjqueue_errors", data)
+		ctx.View("part/footer", data)
 	})
 	router.Get("/api/list", controller.ErrorLogController.GetHjQueueErrorList)
 	router.Get("/api/{errorHash}", controller.ErrorLogController.GetHjQueueAllErrorByHash)
@@ -99,9 +142,15 @@ func apiHjAdmin(router router.Party) {
 		"Title": "HJ Admin Error Log",
 	}
 	router.Get("/", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/table", data)
+		ctx.View("part/footer", data)
 		ctx.View("hjadmin", data)
 	})
 	router.Get("/errors", func(ctx iris.Context) {
+		ctx.View("part/header", data)
+		ctx.View("part/error_table", data)
+		ctx.View("part/footer", data)
 		ctx.View("hjadmin_errors", data)
 	})
 	router.Get("/api/list", controller.ErrorLogController.GetHjAdminErrorList)

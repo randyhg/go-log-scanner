@@ -49,8 +49,8 @@ func errorLogScanner(cmd *cobra.Command, args []string) {
 	} else if len(args) == 1 {
 		logUrl := args[0]
 		singleLogScanner(logUrl, util.Master())
-		fmt.Println("Log printed to /scanned_logs/")
-	} else if len(args) == 2 {
+		fmt.Println("Log printed to ./scanned_logs/")
+	} else if len(args) == 2 { // go run . log-scanner "url" gz
 		logUrl := args[1]
 		if err := singleGzLogScanner(logUrl, util.Master()); err != nil {
 			milog.Error(err)

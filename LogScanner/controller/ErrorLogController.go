@@ -9,6 +9,10 @@ import (
 	"strconv"
 
 	"github.com/kataras/iris/v12"
+	"golang.org/x/text/currency"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
+	"golang.org/x/text/number"
 )
 
 type LogErrorResponse struct {
@@ -24,29 +28,6 @@ func newErrorLogController() *errorLogController {
 }
 
 type errorLogController struct {
-}
-
-type Pagination struct {
-	CurrentPage  int
-	NextPage     int
-	PreviousPage int
-}
-
-// func Index(ctx iris.Context) {
-// 	ctx.View("hjm3u8")
-// }
-
-func Hjm3u8Errors(ctx iris.Context) {
-	page := ctx.Params().GetIntDefault("page", 1)
-	data := map[string]interface{}{
-		"pagination": Pagination{
-			NextPage:     page + 1,
-			PreviousPage: page - 1,
-			CurrentPage:  page,
-		},
-		"path": ctx.Path(),
-	}
-	ctx.View("hjm3u8_errors", data)
 }
 
 func (c *errorLogController) GetHjm3u8ErrorList(ctx iris.Context) {
@@ -210,27 +191,62 @@ func (c *errorLogController) GetHjQueueAllErrorByHash(ctx iris.Context) {
 	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
-// func (c *errorLogController) GetPagination(ctx iris.Context) {
-// 	page := ctx.Params().GetIntDefault("page", 1)
-// 	offset := (page - 1) * 10
-// 	errorHash := ctx.Params().GetString("errorHash")
+func (c *errorLogController) GetChatServerTotalRecord(ctx iris.Context) {
+	total := service.ErrorLogService.GetTotalRecordService(model.ChatServerLogErrors{})
+	cur := currency.MustParseISO("JPY")
+	scale, _ := currency.Cash.Rounding(cur)
+	dec := number.Decimal(total, number.Scale(scale))
+	p := message.NewPrinter(language.English)
+	formattedTotal := p.Sprintf("%v", dec)
+	response.OkWithDataV2(formattedTotal, ctx)
+}
 
-// 	results := service.ErrorLogService.GetAllErrors(model.Hjm3u8LogErrors{}, errorHash, offset)
-// 	fmt.Println(len(results))
+func (c *errorLogController) GetHjAdminTotalRecord(ctx iris.Context) {
+	total := service.ErrorLogService.GetTotalRecordService(model.HjAdminErrors{})
+	cur := currency.MustParseISO("JPY")
+	scale, _ := currency.Cash.Rounding(cur)
+	dec := number.Decimal(total, number.Scale(scale))
+	p := message.NewPrinter(language.English)
+	formattedTotal := p.Sprintf("%v", dec)
+	response.OkWithDataV2(formattedTotal, ctx)
+}
 
-// 	response.OkWithData(results, ctx)
-// }
+func (c *errorLogController) GetHjApiTotalRecord(ctx iris.Context) {
+	total := service.ErrorLogService.GetTotalRecordService(model.HjApiErrors{})
+	cur := currency.MustParseISO("JPY")
+	scale, _ := currency.Cash.Rounding(cur)
+	dec := number.Decimal(total, number.Scale(scale))
+	p := message.NewPrinter(language.English)
+	formattedTotal := p.Sprintf("%v", dec)
+	response.OkWithDataV2(formattedTotal, ctx)
+}
 
-// // daksjdlakdl
-// func (c *errorLogController) GetErrorMessage(ctx iris.Context) {
-// 	hash := "1c27099b3b84b13d0e3fbd299ba93ae7853ec1d0d3a4e5daa89e68b7ad59d7cb"
-// 	message, err := service.ErrorLogService.GetErrorMessageService(hash)
-// 	if err != nil {
-// 		return
-// 	}
-// 	log.Info(message)
-// 	ctx.JSON(LogErrorResponse{
-// 		Message: message,
-// 		Total:   0,
-// 	})
-// }
+func (c *errorLogController) GetHjAppServerTotalRecord(ctx iris.Context) {
+	total := service.ErrorLogService.GetTotalRecordService(model.HjAppServerErrors{})
+	cur := currency.MustParseISO("JPY")
+	scale, _ := currency.Cash.Rounding(cur)
+	dec := number.Decimal(total, number.Scale(scale))
+	p := message.NewPrinter(language.English)
+	formattedTotal := p.Sprintf("%v", dec)
+	response.OkWithDataV2(formattedTotal, ctx)
+}
+
+func (c *errorLogController) GetHjM3u8TotalRecord(ctx iris.Context) {
+	total := service.ErrorLogService.GetTotalRecordService(model.Hjm3u8LogErrors{})
+	cur := currency.MustParseISO("JPY")
+	scale, _ := currency.Cash.Rounding(cur)
+	dec := number.Decimal(total, number.Scale(scale))
+	p := message.NewPrinter(language.English)
+	formattedTotal := p.Sprintf("%v", dec)
+	response.OkWithDataV2(formattedTotal, ctx)
+}
+
+func (c *errorLogController) GetHjQueueTotalRecord(ctx iris.Context) {
+	total := service.ErrorLogService.GetTotalRecordService(model.QueueLogErrors{})
+	cur := currency.MustParseISO("JPY")
+	scale, _ := currency.Cash.Rounding(cur)
+	dec := number.Decimal(total, number.Scale(scale))
+	p := message.NewPrinter(language.English)
+	formattedTotal := p.Sprintf("%v", dec)
+	response.OkWithDataV2(formattedTotal, ctx)
+}
