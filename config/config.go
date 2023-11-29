@@ -15,6 +15,7 @@ type Config struct {
 	SlaveMySqlUrl     string `yaml:"SlaveMySqlUrl"`
 	SlaveMySqlMaxIdle int    `yaml:"SlaveMySqlMaxIdle"`
 	SlaveMySqlMaxOpen int    `yaml:"SlaveMySqlMaxOpen"`
+	BaseURL           string `yaml:"BaseURL"`
 }
 
 var Instance Config

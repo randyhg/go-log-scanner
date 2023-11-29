@@ -32,7 +32,7 @@ type ErrorResults struct {
 
 func (c *errorLogService) GetAll(model interface{}) []Results {
 	var results []Results
-	util.Master().Model(model).Select("MIN(message) as message, MAX(failed_at) AS failed_at, hash as hash, COUNT(*) as total").Group("hash").Order("4 DESC").Scan(&results)
+	util.Master().Model(model).Select("MIN(message) as message, MAX(failed_at) AS failed_at, hash as hash, COUNT(*) as total").Group("hash").Order("2 DESC").Scan(&results)
 	return results
 }
 
