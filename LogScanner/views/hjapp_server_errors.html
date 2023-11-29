@@ -5,7 +5,7 @@
         var urlParams = new URLSearchParams(window.location.search);
         var errorHash = urlParams.get('hash');
         errorHash = errorHash.replace(/'/g, '');
-        var endpoint = 'http://127.0.0.1:8889/hjapp_server/api/' + errorHash;
+        var endpoint = '/hjapp_server/api/' + errorHash;
         $('#myTable').DataTable({
             "processing": true,
             "serverSide": true,

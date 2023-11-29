@@ -3,7 +3,7 @@
         showLoading();
         $.ajax ({
             method: 'GET',
-            url: 'http://127.0.0.1:8889/hjm3u8/api/list',
+            url: '/hjm3u8/api/list',
             success: function(response){
                 var row = ""
                 array = response.data
@@ -16,7 +16,7 @@
                         array[i].file_name,
                         array[i].failed_at,
                         `<div class="d-flex justify-content-center">
-                            <a href="hjapp_server/errors?hash=${array[i].hash}" class="btn btn-primary">More</a>
+                            <a href="hjm3u8/errors?hash=${array[i].hash}" class="btn btn-primary">More</a>
                         </div>`
                     ]).draw(false);
                 }

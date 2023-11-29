@@ -4,7 +4,7 @@
         var urlParams = new URLSearchParams(window.location.search);
         var errorHash = urlParams.get('hash');
         errorHash = errorHash.replace(/'/g, '');
-        var endpoint = 'http://127.0.0.1:8889/hjm3u8/api/' + errorHash;
+        var endpoint = '/hjm3u8/api/' + errorHash;
         $('#myTable').DataTable({
             "processing": true,
             "serverSide": true,

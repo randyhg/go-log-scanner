@@ -3,7 +3,7 @@
         showLoading();
         $.ajax ({
             method: 'GET',
-            url: 'http://127.0.0.1:8889/hjapp_server/api/list',
+            url: '/hjapp_server/api/list',
             success: function(response){
                 var row = ""
                 array = response.data
