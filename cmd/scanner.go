@@ -113,13 +113,13 @@ func scanAllLogs(db *gorm.DB) {
 	wg.Wait()
 }
 
-func multipleUrlScanner(directoryURL string, db *gorm.DB, wg *sync.WaitGroup) error {
+func multipleUrlScanner(directoryURL string, db *gorm.DB, wg *sync.WaitGroup) {
 	defer wg.Done()
 	if err := scanGzFiles(directoryURL, db); err != nil {
 		milog.Errorf("Scan %s error: %s", directoryURL, err)
-		return err
+		return
 	}
-	return nil
+	return
 }
 
 func singleLogScanner(logUrl string, db *gorm.DB) {
@@ -222,6 +222,7 @@ func hjAdminValidation(directoryURL string, db *gorm.DB, wg *sync.WaitGroup) {
 	if !scanned {
 		hjadmin.HjAdminLogScanner(directoryURL, db)
 	}
+	return
 }
 
 func scanGzFiles(directoryURL string, db *gorm.DB) error {

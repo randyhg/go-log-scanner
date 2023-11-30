@@ -32,16 +32,20 @@
         $('#content').slideDown(300);
     });
     }
-</script>
-<script>
-    $(document).ready(function() {
+
+    function fetchData(url) {
         showLoading();
-        $.ajax ({
+        return $.ajax({
             method: 'GET',
-            url: '/hjqueue/api/list',
-            success: function(response){
-                var row = ""
+            url : url
+        });
+    }
+    
+    fetchData('/hjqueue/api/list')
+        .then(response => {
+            setTimeout(function() {
                 array = response.data
+                console.log(response.data);
                 var table = $('#myTable').DataTable();
                 for (var i = 0; i <= array.length; i++) {
                     table.row.add([
@@ -55,11 +59,12 @@
                         </div>`
                     ]).draw(false);
                 }
-            }            
+            }, 2000);
+            hideLoading();
         })
-        hideLoading();
-    })
-
+        .catch(error => {
+            console.error('Error:', error);
+        });
 </script>
 
 

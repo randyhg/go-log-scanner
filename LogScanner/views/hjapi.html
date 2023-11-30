@@ -1,12 +1,9 @@
 <script>
-    $(document).ready(function() {
-        showLoading();
-        $.ajax ({
-            method: 'GET',
-            url: '/hjapi/api/list',
-            success: function(response){
-                var row = ""
+    fetchData('/hjapi/api/list')
+        .then(response => {
+            setTimeout(function() {
                 array = response.data
+                console.log(response.data);
                 var table = $('#myTable').DataTable();
                 for (var i = 0; i <= array.length; i++) {
                     table.row.add([
@@ -20,12 +17,12 @@
                         </div>`
                     ]).draw(false);
                 }
-            }            
+            }, 2000);
+            hideLoading();
         })
-        hideLoading();
-    })
-
+        .catch(error => {
+            console.error('Error:', error);
+        });
 </script>
-
 
 
