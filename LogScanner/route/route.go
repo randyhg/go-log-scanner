@@ -2,14 +2,27 @@ package route
 
 import (
 	"go-log-scanner/LogScanner/controller"
+	"go-log-scanner/config"
 
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/core/router"
+	"github.com/kataras/iris/v12/middleware/basicauth"
 )
 
 func RegisterRoutes(app *iris.Application) {
 	tmpl := iris.HTML("./LogScanner/views", ".html")
 	app.RegisterView(tmpl)
+	apiTotal(app.Party("/total"))
+
+	opts := basicauth.Options{
+		Allow: basicauth.AllowUsers(map[string]string{
+			config.Instance.Username: config.Instance.Password,
+		}),
+		Realm:        "Authorization Required",
+		ErrorHandler: basicauth.DefaultErrorHandler,
+	}
+	auth := basicauth.New(opts)
+	app.Use(auth)
 
 	app.Get("/", func(ctx iris.Context) {
 		data := iris.Map{
@@ -20,7 +33,6 @@ func RegisterRoutes(app *iris.Application) {
 		ctx.View("part/footer")
 	})
 
-	apiTotal(app.Party("/total"))
 	apiHjm3u8(app.Party("/hjm3u8"))
 	apiChatServer(app.Party("/chat_server"))
 	apiHjAppServer(app.Party("/hjapp_server"))

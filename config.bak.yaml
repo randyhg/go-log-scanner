@@ -1,4 +1,7 @@
 Host: "0.0.0.0:8889"
+Username: "admin"
+Password : "123"
+
 
 MySqlUrl: root:123456@tcp(127.0.0.1:3306)/error_log?charset=utf8mb4&parseTime=True&loc=Local
 MySqlMaxIdle: 5

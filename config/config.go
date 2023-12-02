@@ -8,6 +8,8 @@ import (
 
 type Config struct {
 	Host              string `yaml:"Host"`
+	Username          string `yaml:"Username"`
+	Password          string `yaml:"Password"`
 	ShowSql           bool   `yaml:"ShowSql"`
 	MySqlUrl          string `yaml:"MySqlUrl"`
 	MySqlMaxIdle      int    `yaml:"MySqlMaxIdle"`

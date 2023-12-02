@@ -85,12 +85,12 @@
 
 
   var apiUrls = [
-      'http://127.0.0.1:8889/total/chat_server',
-      'http://127.0.0.1:8889/total/hjadmin',
-      'http://127.0.0.1:8889/total/hjapi',
-      'http://127.0.0.1:8889/total/hjapp_server',
-      'http://127.0.0.1:8889/total/hjm3u8',
-      'http://127.0.0.1:8889/total/hjqueue',
+      '/total/chat_server',
+      '/total/hjadmin',
+      '/total/hjapi',
+      '/total/hjapp_server',
+      '/total/hjm3u8',
+      '/total/hjqueue',
   ];
 
   Promise.all(apiUrls.map(url => fetchData(url)))
