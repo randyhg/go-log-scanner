@@ -3,6 +3,7 @@ package service
 import (
 	"go-log-scanner/util"
 	milog "hj_common/log"
+	"unicode/utf8"
 )
 
 var ErrorLogService = newErrorLogService()
@@ -69,4 +70,19 @@ func (c *errorLogService) GetTotalRecordService(model interface{}) int64 {
 		return 0
 	}
 	return total
+}
+
+func (c *errorLogService) LimitString(s string, n int) string {
+	runeCount := utf8.RuneCountInString(s)
+
+	if runeCount <= n {
+		return s
+	}
+
+	runes := []rune(s)
+	limitedRunes := runes[:n]
+
+	limitedString := string(limitedRunes)
+
+	return limitedString
 }

@@ -35,6 +35,8 @@ func (c *errorLogController) GetHjm3u8ErrorList(ctx iris.Context) {
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
+		limitedMessage := service.ErrorLogService.LimitString(result.Message, 100)
+		results[i].Message = limitedMessage
 		if len(match) >= 3 {
 			fileName := match[1]
 			lineNumber := match[2]
@@ -62,6 +64,8 @@ func (c *errorLogController) GetChatServerErrorList(ctx iris.Context) {
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
+		limitedMessage := service.ErrorLogService.LimitString(result.Message, 100)
+		results[i].Message = limitedMessage
 		if len(match) >= 3 {
 			fileName := match[1]
 			lineNumber := match[2]
@@ -89,6 +93,8 @@ func (c *errorLogController) GetHjAppServerErrorList(ctx iris.Context) {
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
+		limitedMessage := service.ErrorLogService.LimitString(result.Message, 100)
+		results[i].Message = limitedMessage
 		if len(match) >= 3 {
 			fileName := match[1]
 			lineNumber := match[2]
@@ -116,6 +122,8 @@ func (c *errorLogController) GetHjApiErrorList(ctx iris.Context) {
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
+		limitedMessage := service.ErrorLogService.LimitString(result.Message, 100)
+		results[i].Message = limitedMessage
 		if len(match) >= 3 {
 			fileName := match[1]
 			lineNumber := match[2]
@@ -143,6 +151,8 @@ func (c *errorLogController) GetHjAdminErrorList(ctx iris.Context) {
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
+		limitedMessage := service.ErrorLogService.LimitString(result.Message, 100)
+		results[i].Message = limitedMessage
 		if len(match) >= 3 {
 			fileName := match[1]
 			lineNumber := match[2]
@@ -170,6 +180,8 @@ func (c *errorLogController) GetHjQueueErrorList(ctx iris.Context) {
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
+		limitedMessage := service.ErrorLogService.LimitString(result.Message, 100)
+		results[i].Message = limitedMessage
 		if len(match) >= 3 {
 			fileName := match[1]
 			lineNumber := match[2]
