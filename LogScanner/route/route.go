@@ -143,7 +143,6 @@ func apiHjQueue(router router.Party) {
 	router.Get("/errors", func(ctx iris.Context) {
 		ctx.View("part/header", data)
 		ctx.View("hjqueue_errors", data)
-		ctx.View("part/footer", data)
 	})
 	router.Get("/api/list", controller.ErrorLogController.GetHjQueueErrorList)
 	router.Get("/api/{errorHash}", controller.ErrorLogController.GetHjQueueAllErrorByHash)
