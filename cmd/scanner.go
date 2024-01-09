@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"compress/gzip"
 	"fmt"
+	"github.com/spf13/cobra"
 	"go-log-scanner/config"
 	"go-log-scanner/error_log_scanner/chatserver"
 	"go-log-scanner/error_log_scanner/hjadmin"
@@ -12,6 +13,8 @@ import (
 	"go-log-scanner/error_log_scanner/hjm3u8"
 	"go-log-scanner/error_log_scanner/hjqueue"
 	"go-log-scanner/util"
+	"golang.org/x/net/html"
+	"gorm.io/gorm"
 	milog "hj_common/log"
 	"log"
 	"net/http"
@@ -20,10 +23,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/spf13/cobra"
-	"golang.org/x/net/html"
-	"gorm.io/gorm"
 )
 
 var logScanner = &cobra.Command{
@@ -269,7 +268,9 @@ func scanGzFiles(directoryURL string, db *gorm.DB) error {
 			for _, attr := range n.Attr {
 				if attr.Key == "href" && strings.HasSuffix(attr.Val, ".log.gz") {
 					fileList = append(fileList, directoryURL+attr.Val)
-				}
+				} // else if attr.Key == "href" && strings.HasSuffix(attr.Val, ".log") {
+				//	fileList = append(fileList, directoryURL+attr.Val)
+				//}
 			}
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
