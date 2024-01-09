@@ -85,6 +85,11 @@ type QueueLogErrors struct {
 	Hash     *string
 }
 
+type QueueScannedLogs struct {
+	ID       int    `gorm:"primaryKey"`
+	FileName string `gorm:"type:text"`
+}
+
 func Sha256(data string) string {
 	match := fileNameRegex.FindStringSubmatch(data)
 	if len(match) >= 3 {
