@@ -2,6 +2,7 @@ package hjqueue
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	model "go-log-scanner/error_log_scanner/log_model"
 	"go-log-scanner/util"
@@ -32,9 +33,19 @@ func PatternedLogScanner(baseURL string, logName string, start time.Time, end ti
 		logURL := getURL(baseURL, logName, currentTime)
 		// fmt.Println(logURL)
 
+		scanned, err := isScanned(logURL, util.Master())
+		if err != nil {
+			log.Error("Error while check isScanned", err)
+			return
+		}
+
+		if scanned {
+			continue
+		}
+
 		resp, err := http.Get(logURL)
 		if err != nil {
-			fmt.Println("Get log failed:", err)
+			log.Error("Get log failed:", err)
 			return
 		}
 		defer resp.Body.Close()
@@ -72,4 +83,35 @@ func PatternedLogScanner(baseURL string, logName string, start time.Time, end ti
 
 	}
 	fmt.Println(logName, "successfully scanned")
+}
+
+func isScanned(fileName string, db *gorm.DB) (scanned bool, err error) {
+	sql := `CREATE TABLE t_queue_scanned_logs (
+		id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+		file_name TEXT NOT NULL, 
+		scanned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);`
+
+	if !db.Migrator().HasTable("t_queue_scanned_logs") {
+		db.Exec(sql)
+	}
+
+	var existing model.QueueScannedLogs
+	if err := db.Model(model.QueueScannedLogs{}).Where("file_name = ?", fileName).First(&existing).Error; err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			fmt.Println("Error querying database:", err)
+			return false, err
+		}
+	}
+	if existing.FileName != "" {
+		return true, nil
+	}
+	scanned_log := model.QueueScannedLogs{
+		FileName: fileName,
+	}
+	if err := db.Create(&scanned_log).Error; err != nil {
+		fmt.Println("Error creating record in database:", err)
+		return false, err
+	}
+	return false, nil
 }
