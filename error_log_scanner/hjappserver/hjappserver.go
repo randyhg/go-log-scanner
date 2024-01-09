@@ -56,6 +56,8 @@ func GzippedLogFileReader(logURL string, db *gorm.DB) error {
 	defer reader.Close()
 
 	scanner := bufio.NewScanner(reader)
+	buf := make([]byte, 0, 64*1024)
+	scanner.Buffer(buf, 1024*1024)
 
 	var stackFlag = false
 	var stackTraces []string

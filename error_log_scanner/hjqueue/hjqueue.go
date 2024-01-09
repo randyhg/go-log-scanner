@@ -32,6 +32,9 @@ func PatternedLogScanner(baseURL string, logName string, start time.Time, end ti
 		defer resp.Body.Close()
 
 		scanner := bufio.NewScanner(resp.Body)
+		buf := make([]byte, 0, 64*1024)
+		scanner.Buffer(buf, 1024*1024)
+
 		for scanner.Scan() {
 			line := scanner.Text()
 			if strings.Contains(line, "|err") {
