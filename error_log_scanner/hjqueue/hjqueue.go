@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	model "go-log-scanner/error_log_scanner/log_model"
+	"go-log-scanner/util"
+	"hj_common/dbmodel"
+	"hj_common/log"
 	"net/http"
 	"strings"
 	"sync"
@@ -19,7 +22,12 @@ func getURL(baseURL, logName string, currentTime time.Time) string {
 
 func PatternedLogScanner(baseURL string, logName string, start time.Time, end time.Time, db *gorm.DB, wg *sync.WaitGroup) {
 	defer wg.Done()
-	db.AutoMigrate(&model.QueueLogErrors{})
+	//db.AutoMigrate(&model.QueueLogErrors{})
+	tableName := dbmodel.GetMonthTableName(model.QueueLogErrors{})
+	if err := util.CreateMonthTable(util.Master(), model.QueueLogErrors{}, tableName); err != nil {
+		log.Error(err)
+	}
+
 	for currentTime := start; currentTime.Before(end) || currentTime.Equal(end); currentTime = currentTime.Add(time.Hour) {
 		logURL := getURL(baseURL, logName, currentTime)
 		// fmt.Println(logURL)
@@ -49,8 +57,8 @@ func PatternedLogScanner(baseURL string, logName string, start time.Time, end ti
 						FailedAt: timestamp,
 						Hash:     &hash,
 					}
-					db.Create(&queueLog)
-					fmt.Println("Successfully input queue log")
+					//db.Create(&queueLog)
+					db.Table(tableName).Create(&queueLog)
 				}
 			} //else {
 			// 	fmt.Println(line)

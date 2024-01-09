@@ -98,6 +98,30 @@ func Sha256(data string) string {
 	return ""
 }
 
+func (ChatServerLogErrors) TableName() string {
+	return "t_chat_server_log_errors"
+}
+
+func (HjApiErrors) TableName() string {
+	return "t_hj_api_errors"
+}
+
+func (HjAppServerErrors) TableName() string {
+	return "t_hj_app_server_errors"
+}
+
+func (Hjm3u8LogErrors) TableName() string {
+	return "t_hjm3u8_log_errors"
+}
+
+func (QueueLogErrors) TableName() string {
+	return "t_queue_log_errors"
+}
+
+func (HjAdminErrors) TableName() string {
+	return "t_hj_admin_errors"
+}
+
 func HjAdminSha256(data string) string {
 	match := hjAdminRegex.FindStringSubmatch(data)
 	if len(match) >= 3 {

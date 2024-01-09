@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 	model "go-log-scanner/error_log_scanner/log_model"
+	"go-log-scanner/util"
+	"hj_common/dbmodel"
+	milog "hj_common/log"
 	"log"
 	"net/http"
 	"strings"
@@ -42,7 +45,12 @@ func IsScanned(fileName string, db *gorm.DB) (scanned bool, err error) {
 }
 
 func HjAdminLogScanner(logURL string, db *gorm.DB) {
-	db.AutoMigrate(&model.HjAdminErrors{})
+	//db.AutoMigrate(&model.HjAdminErrors{})
+	tableName := dbmodel.GetMonthTableName(model.HjAdminErrors{})
+	if err := util.CreateMonthTable(util.Master(), model.HjAppServerErrors{}, tableName); err != nil {
+		milog.Error(err)
+	}
+
 	resp, err := http.Get(logURL)
 	if err != nil {
 		log.Fatal(err)
@@ -72,7 +80,8 @@ func HjAdminLogScanner(logURL string, db *gorm.DB) {
 					FailedAt: timestamp,
 					Hash:     &hash,
 				}
-				db.Create(&logError)
+				//db.Create(&logError)
+				db.Table(tableName).Create(&logError)
 			}
 		} else if strings.Contains(line, "goroutine") && !stackFlag {
 			traceHeadMessage = line
@@ -98,7 +107,8 @@ func HjAdminLogScanner(logURL string, db *gorm.DB) {
 					FailedAt:   timestamp,
 					Hash:       &hash,
 				}
-				db.Create(&logError)
+				//db.Create(&logError)
+				db.Table(tableName).Create(&logError)
 			}
 		}
 	}
