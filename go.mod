@@ -11,6 +11,7 @@ require (
 	golang.org/x/text v0.7.0
 	gorm.io/driver/mysql v1.4.7
 	gorm.io/gorm v1.24.5
+	github.com/goburrow/cache v0.1.4
 	hj_common v0.0.0
 )
 
@@ -72,6 +73,7 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+
 )
 
 replace hj_common v0.0.0 => ./hj_common
