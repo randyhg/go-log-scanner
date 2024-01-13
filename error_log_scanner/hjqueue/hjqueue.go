@@ -63,7 +63,7 @@ func PatternedLogScanner(baseURL string, logName string, start time.Time, end ti
 						Hash:     &hash,
 					}
 					db.Create(&queueLog)
-					fmt.Println("Successfully input queue log")
+					fmt.Println(logName, "successfully scanned")
 				}
 			} //else {
 			// 	fmt.Println(line)
@@ -76,7 +76,6 @@ func PatternedLogScanner(baseURL string, logName string, start time.Time, end ti
 		}
 
 	}
-	fmt.Println(logName, "successfully scanned")
 }
 
 func isScanned(fileName string, db *gorm.DB) (scanned bool, err error) {
