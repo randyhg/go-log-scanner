@@ -9,6 +9,14 @@ const (
 	SUCCESS = 0
 )
 
+type JsonResult struct {
+	IsEncrypted bool        `json:"isEncrypted"`
+	ErrorCode   int         `json:"errorCode"`
+	Message     string      `json:"message"`
+	Success     bool        `json:"success"`
+	Data        interface{} `json:"data"`
+}
+
 func Result(code int, data interface{}, msg string, draw, recordsTotal, recordsFiltered int64, ctx iris.Context) {
 	ctx.JSON(iris.Map{
 		"code":            code,
@@ -28,10 +36,6 @@ func ResultV2(code int, data interface{}, msg string, ctx iris.Context) {
 	})
 }
 
-// func FailWithMessage(message string, ctx iris.Context) {
-// 	Result(ERROR, map[string]interface{}{}, message, ctx)
-// }
-
 func OkWithDataV2(data interface{}, ctx iris.Context) {
 	ResultV2(SUCCESS, data, "Successful operation", ctx)
 }
@@ -48,10 +52,6 @@ func OkWithData(data interface{}, draw, recordsTotal, recordsFiltered int64, ctx
 // 	Result(SUCCESS, data, message, ctx)
 // }
 
-type PageResult struct {
-	List     interface{} `json:"list"`
-	Total    int64       `json:"total"`
-	Page     int         `json:"page"`
-	PageSize int         `json:"pageSize"`
-	ScrollId string      `json:"scrollId"`
-}
+// func FailWithMessage(message string, ctx iris.Context) {
+// 	Result(ERROR, map[string]interface{}{}, message, ctx)
+// }

@@ -1,6 +1,7 @@
 package route
 
 import (
+	"go-log-scanner/LogScanner/cache"
 	"go-log-scanner/LogScanner/controller"
 	"go-log-scanner/config"
 
@@ -43,12 +44,12 @@ func RegisterRoutes(app *iris.Application) {
 }
 
 func apiTotal(router router.Party) {
-	router.Get("/chat_server", controller.ErrorLogController.GetChatServerTotalRecord)
-	router.Get("/hjadmin", controller.ErrorLogController.GetHjAdminTotalRecord)
-	router.Get("/hjapi", controller.ErrorLogController.GetHjApiTotalRecord)
-	router.Get("/hjapp_server", controller.ErrorLogController.GetHjAppServerTotalRecord)
-	router.Get("/hjm3u8", controller.ErrorLogController.GetHjM3u8TotalRecord)
-	router.Get("/hjqueue", controller.ErrorLogController.GetHjQueueTotalRecord)
+	router.Get("/chat_server", cache.HandleCache(controller.ErrorLogController.GetChatServerTotalRecord))
+	router.Get("/hjadmin", cache.HandleCache(controller.ErrorLogController.GetHjAdminTotalRecord))
+	router.Get("/hjapi", cache.HandleCache(controller.ErrorLogController.GetHjApiTotalRecord))
+	router.Get("/hjapp_server", cache.HandleCache(controller.ErrorLogController.GetHjAppServerTotalRecord))
+	router.Get("/hjm3u8", cache.HandleCache(controller.ErrorLogController.GetHjM3u8TotalRecord))
+	router.Get("/hjqueue", cache.HandleCache(controller.ErrorLogController.GetHjQueueTotalRecord))
 }
 
 func apiHjm3u8(router router.Party) {
@@ -67,7 +68,7 @@ func apiHjm3u8(router router.Party) {
 		ctx.View("part/footer", data)
 		ctx.View("hjm3u8_errors", data)
 	})
-	router.Get("/api/list", controller.ErrorLogController.GetHjm3u8ErrorList)
+	router.Get("/api/list", cache.HandleCache(controller.ErrorLogController.GetHjm3u8ErrorList))
 	router.Get("/api/{errorHash}", controller.ErrorLogController.GetHjm3u8AllErrorByHash)
 }
 
@@ -87,7 +88,7 @@ func apiChatServer(router router.Party) {
 		ctx.View("part/footer", data)
 		ctx.View("chat_server_errors", data)
 	})
-	router.Get("/api/list", controller.ErrorLogController.GetChatServerErrorList)
+	router.Get("/api/list", cache.HandleCache(controller.ErrorLogController.GetChatServerErrorList))
 	router.Get("/api/{errorHash}", controller.ErrorLogController.GetChatServerAllErrorByHash)
 }
 
@@ -107,7 +108,7 @@ func apiHjAppServer(router router.Party) {
 		ctx.View("part/footer", data)
 		ctx.View("hjapp_server_errors", data)
 	})
-	router.Get("/api/list", controller.ErrorLogController.GetHjAppServerErrorList)
+	router.Get("/api/list", cache.HandleCache(controller.ErrorLogController.GetHjAppServerErrorList))
 	router.Get("/api/{errorHash}", controller.ErrorLogController.GetHjAppServerAllErrorByHash)
 }
 
@@ -127,7 +128,7 @@ func apiHjApi(router router.Party) {
 		ctx.View("part/footer", data)
 		ctx.View("hjapi_errors", data)
 	})
-	router.Get("/api/list", controller.ErrorLogController.GetHjApiErrorList)
+	router.Get("/api/list", cache.HandleCache(controller.ErrorLogController.GetHjApiErrorList))
 	router.Get("/api/{errorHash}", controller.ErrorLogController.GetHjApiAllErrorByHash)
 }
 
@@ -144,7 +145,7 @@ func apiHjQueue(router router.Party) {
 		ctx.View("part/header", data)
 		ctx.View("hjqueue_errors", data)
 	})
-	router.Get("/api/list", controller.ErrorLogController.GetHjQueueErrorList)
+	router.Get("/api/list", cache.HandleCache(controller.ErrorLogController.GetHjQueueErrorList))
 	router.Get("/api/{errorHash}", controller.ErrorLogController.GetHjQueueAllErrorByHash)
 }
 
@@ -164,6 +165,6 @@ func apiHjAdmin(router router.Party) {
 		ctx.View("part/footer", data)
 		ctx.View("hjadmin_errors", data)
 	})
-	router.Get("/api/list", controller.ErrorLogController.GetHjAdminErrorList)
+	router.Get("/api/list", cache.HandleCache(controller.ErrorLogController.GetHjAdminErrorList))
 	router.Get("/api/{errorHash}", controller.ErrorLogController.GetHjAdminAllErrorByHash)
 }
