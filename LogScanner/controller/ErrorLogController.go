@@ -2,9 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"go-log-scanner/LogScanner/model"
+	//"go-log-scanner/LogScanner/model"
 	"go-log-scanner/LogScanner/response"
 	"go-log-scanner/LogScanner/service"
+	model "go-log-scanner/error_log_scanner/log_model"
+	"hj_common/dbmodel"
 	"regexp"
 	"strconv"
 
@@ -31,7 +33,8 @@ type errorLogController struct {
 }
 
 func (c *errorLogController) GetHjm3u8ErrorList(ctx iris.Context) response.JsonResult {
-	results := service.ErrorLogService.GetAll(model.Hjm3u8LogErrors{})
+	tableName := dbmodel.GetMonthTableName(model.Hjm3u8LogErrors{})
+	results := service.ErrorLogService.GetAll(tableName)
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
@@ -54,15 +57,17 @@ func (c *errorLogController) GetHjm3u8AllErrorByHash(ctx iris.Context) {
 	start, _ := strconv.Atoi(ctx.URLParam("start"))
 	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrorsV2(model.Hjm3u8LogErrors{}, errorHash, start, length)
+	tableName := dbmodel.GetMonthTableName(model.Hjm3u8LogErrors{})
+	results := service.ErrorLogService.GetAllErrorsV2(tableName, errorHash, start, length)
 
 	// response.OkWithData(results, ctx)
-	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.Hjm3u8LogErrors{}, errorHash)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(tableName, errorHash)
 	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetChatServerErrorList(ctx iris.Context) response.JsonResult {
-	results := service.ErrorLogService.GetAll(model.ChatServerLogErrors{})
+	tableName := dbmodel.GetMonthTableName(model.ChatServerLogErrors{})
+	results := service.ErrorLogService.GetAll(tableName)
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
@@ -85,15 +90,17 @@ func (c *errorLogController) GetChatServerAllErrorByHash(ctx iris.Context) {
 	start, _ := strconv.Atoi(ctx.URLParam("start"))
 	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrorsV2(model.ChatServerLogErrors{}, errorHash, start, length)
+	tableName := dbmodel.GetMonthTableName(model.ChatServerLogErrors{})
+	results := service.ErrorLogService.GetAllErrorsV2(tableName, errorHash, start, length)
 
 	// response.OkWithData(results, ctx)
-	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.ChatServerLogErrors{}, errorHash)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(tableName, errorHash)
 	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetHjAppServerErrorList(ctx iris.Context) response.JsonResult {
-	results := service.ErrorLogService.GetAll(model.HjAppServerErrors{})
+	tableName := dbmodel.GetMonthTableName(model.HjAppServerErrors{})
+	results := service.ErrorLogService.GetAll(tableName)
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
@@ -116,15 +123,17 @@ func (c *errorLogController) GetHjAppServerAllErrorByHash(ctx iris.Context) {
 	start, _ := strconv.Atoi(ctx.URLParam("start"))
 	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrorsV2(model.HjAppServerErrors{}, errorHash, start, length)
+	tableName := dbmodel.GetMonthTableName(model.HjAppServerErrors{})
+	results := service.ErrorLogService.GetAllErrorsV2(tableName, errorHash, start, length)
 
 	// response.OkWithData(results, ctx)
-	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.HjAppServerErrors{}, errorHash)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(tableName, errorHash)
 	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetHjApiErrorList(ctx iris.Context) response.JsonResult {
-	results := service.ErrorLogService.GetAll(model.HjApiErrors{})
+	tableName := dbmodel.GetMonthTableName(model.HjApiErrors{})
+	results := service.ErrorLogService.GetAll(tableName)
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
@@ -147,15 +156,17 @@ func (c *errorLogController) GetHjApiAllErrorByHash(ctx iris.Context) {
 	start, _ := strconv.Atoi(ctx.URLParam("start"))
 	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrorsV2(model.HjApiErrors{}, errorHash, start, length)
+	tableName := dbmodel.GetMonthTableName(model.HjApiErrors{})
+	results := service.ErrorLogService.GetAllErrorsV2(tableName, errorHash, start, length)
 
 	// response.OkWithData(results, ctx)
-	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.HjApiErrors{}, errorHash)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(tableName, errorHash)
 	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetHjAdminErrorList(ctx iris.Context) response.JsonResult {
-	results := service.ErrorLogService.GetAll(model.HjAdminErrors{})
+	tableName := dbmodel.GetMonthTableName(model.HjAdminErrors{})
+	results := service.ErrorLogService.GetAll(tableName)
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
@@ -178,15 +189,17 @@ func (c *errorLogController) GetHjAdminAllErrorByHash(ctx iris.Context) {
 	start, _ := strconv.Atoi(ctx.URLParam("start"))
 	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrorsV2(model.HjAdminErrors{}, errorHash, start, length)
+	tableName := dbmodel.GetMonthTableName(model.HjAdminErrors{})
+	results := service.ErrorLogService.GetAllErrorsV2(tableName, errorHash, start, length)
 
-	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.HjAdminErrors{}, errorHash)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(tableName, errorHash)
 	// response.OkWithData(results, ctx)
 	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetHjQueueErrorList(ctx iris.Context) response.JsonResult {
-	results := service.ErrorLogService.GetAll(model.QueueLogErrors{})
+	tableName := dbmodel.GetMonthTableName(model.QueueLogErrors{})
+	results := service.ErrorLogService.GetAll(tableName)
 
 	for i, result := range results {
 		match := fileNameRegex.FindStringSubmatch(result.Message)
@@ -209,14 +222,16 @@ func (c *errorLogController) GetHjQueueAllErrorByHash(ctx iris.Context) {
 	start, _ := strconv.Atoi(ctx.URLParam("start"))
 	length, _ := strconv.Atoi(ctx.URLParam("length"))
 	errorHash := ctx.Params().GetString("errorHash")
-	results := service.ErrorLogService.GetAllErrorsV2(model.QueueLogErrors{}, errorHash, start, length)
+	tableName := dbmodel.GetMonthTableName(model.QueueLogErrors{})
+	results := service.ErrorLogService.GetAllErrorsV2(tableName, errorHash, start, length)
 
-	total := service.ErrorLogService.GetAllErrorsTotalByHash(model.QueueLogErrors{}, errorHash)
+	total := service.ErrorLogService.GetAllErrorsTotalByHash(tableName, errorHash)
 	response.OkWithData(results, int64(draw), total, total, ctx)
 }
 
 func (c *errorLogController) GetChatServerTotalRecord(ctx iris.Context) response.JsonResult {
-	total := service.ErrorLogService.GetTotalRecordService(model.ChatServerLogErrors{})
+	tableName := dbmodel.GetMonthTableName(model.ChatServerLogErrors{})
+	total := service.ErrorLogService.GetTotalRecordService(tableName)
 	cur := currency.MustParseISO("JPY")
 	scale, _ := currency.Cash.Rounding(cur)
 	dec := number.Decimal(total, number.Scale(scale))
@@ -228,7 +243,8 @@ func (c *errorLogController) GetChatServerTotalRecord(ctx iris.Context) response
 }
 
 func (c *errorLogController) GetHjAdminTotalRecord(ctx iris.Context) response.JsonResult {
-	total := service.ErrorLogService.GetTotalRecordService(model.HjAdminErrors{})
+	tableName := dbmodel.GetMonthTableName(model.ChatServerLogErrors{})
+	total := service.ErrorLogService.GetTotalRecordService(tableName)
 	cur := currency.MustParseISO("JPY")
 	scale, _ := currency.Cash.Rounding(cur)
 	dec := number.Decimal(total, number.Scale(scale))
@@ -240,7 +256,8 @@ func (c *errorLogController) GetHjAdminTotalRecord(ctx iris.Context) response.Js
 }
 
 func (c *errorLogController) GetHjApiTotalRecord(ctx iris.Context) response.JsonResult {
-	total := service.ErrorLogService.GetTotalRecordService(model.HjApiErrors{})
+	tableName := dbmodel.GetMonthTableName(model.HjApiErrors{})
+	total := service.ErrorLogService.GetTotalRecordService(tableName)
 	cur := currency.MustParseISO("JPY")
 	scale, _ := currency.Cash.Rounding(cur)
 	dec := number.Decimal(total, number.Scale(scale))
@@ -252,7 +269,8 @@ func (c *errorLogController) GetHjApiTotalRecord(ctx iris.Context) response.Json
 }
 
 func (c *errorLogController) GetHjAppServerTotalRecord(ctx iris.Context) response.JsonResult {
-	total := service.ErrorLogService.GetTotalRecordService(model.HjAppServerErrors{})
+	tableName := dbmodel.GetMonthTableName(model.HjAppServerErrors{})
+	total := service.ErrorLogService.GetTotalRecordService(tableName)
 	cur := currency.MustParseISO("JPY")
 	scale, _ := currency.Cash.Rounding(cur)
 	dec := number.Decimal(total, number.Scale(scale))
@@ -264,7 +282,8 @@ func (c *errorLogController) GetHjAppServerTotalRecord(ctx iris.Context) respons
 }
 
 func (c *errorLogController) GetHjM3u8TotalRecord(ctx iris.Context) response.JsonResult {
-	total := service.ErrorLogService.GetTotalRecordService(model.Hjm3u8LogErrors{})
+	tableName := dbmodel.GetMonthTableName(model.Hjm3u8LogErrors{})
+	total := service.ErrorLogService.GetTotalRecordService(tableName)
 	cur := currency.MustParseISO("JPY")
 	scale, _ := currency.Cash.Rounding(cur)
 	dec := number.Decimal(total, number.Scale(scale))
@@ -276,7 +295,8 @@ func (c *errorLogController) GetHjM3u8TotalRecord(ctx iris.Context) response.Jso
 }
 
 func (c *errorLogController) GetHjQueueTotalRecord(ctx iris.Context) response.JsonResult {
-	total := service.ErrorLogService.GetTotalRecordService(model.QueueLogErrors{})
+	tableName := dbmodel.GetMonthTableName(model.QueueLogErrors{})
+	total := service.ErrorLogService.GetTotalRecordService(tableName)
 	cur := currency.MustParseISO("JPY")
 	scale, _ := currency.Cash.Rounding(cur)
 	dec := number.Decimal(total, number.Scale(scale))

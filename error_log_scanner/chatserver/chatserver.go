@@ -6,6 +6,9 @@ import (
 	"errors"
 	"fmt"
 	model "go-log-scanner/error_log_scanner/log_model"
+	"go-log-scanner/util"
+	"hj_common/dbmodel"
+	"hj_common/log"
 	"net/http"
 	"strings"
 
@@ -42,7 +45,13 @@ func IsScanned(fileName string, db *gorm.DB) (scanned bool, err error) {
 }
 
 func GzippedLogFileReader(logURL string, db *gorm.DB) error {
-	db.AutoMigrate(&model.ChatServerLogErrors{})
+	//db.AutoMigrate(&model.ChatServerLogErrors{})
+	tableName := dbmodel.GetMonthTableName(model.ChatServerLogErrors{})
+	if err := util.CreateMonthTable(util.Master(), model.ChatServerLogErrors{}, tableName); err != nil {
+		log.Error(err)
+		return err
+	}
+
 	resp, err := http.Get(logURL)
 	if err != nil {
 		return err
@@ -77,7 +86,8 @@ func GzippedLogFileReader(logURL string, db *gorm.DB) error {
 					FailedAt: timestamp,
 					Hash:     &hash,
 				}
-				db.Create(&logError)
+				//db.Create(&logError)
+				db.Table(tableName).Create(&logError)
 			}
 		} else if strings.Contains(line, "goroutine") && !stackFlag {
 			traceHeadMessage = line
@@ -103,7 +113,8 @@ func GzippedLogFileReader(logURL string, db *gorm.DB) error {
 					FailedAt:   timestamp,
 					Hash:       &hash,
 				}
-				db.Create(&logError)
+				//db.Create(&logError)
+				db.Table(tableName).Create(&logError)
 			}
 		}
 	}

@@ -70,3 +70,16 @@ func Init() {
 	}
 	milog.Info("MySQL connection established")
 }
+
+func CreateMonthTable(db *gorm.DB, dst schema.Tabler, tableName string) error {
+	mig := db.Migrator()
+	if !mig.HasTable(tableName) {
+		if err := mig.CreateTable(dst); err != nil {
+			return err
+		}
+		if err := mig.RenameTable(dst.TableName(), tableName); err != nil {
+			return err
+		}
+	}
+	return nil
+}

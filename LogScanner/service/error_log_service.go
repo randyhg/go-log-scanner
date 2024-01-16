@@ -31,9 +31,9 @@ type ErrorResults struct {
 	Hash       string `gorm:"hash" json:"hash"`
 }
 
-func (c *errorLogService) GetAll(model interface{}) []Results {
+func (c *errorLogService) GetAll(tableName string) []Results {
 	var results []Results
-	util.Master().Model(model).Select("MIN(message) as message, MAX(failed_at) AS failed_at, hash as hash, COUNT(*) as total").Group("hash").Order("2 DESC").Scan(&results)
+	util.Master().Table(tableName).Select("MIN(message) as message, MAX(failed_at) AS failed_at, hash as hash, COUNT(*) as total").Group("hash").Order("2 DESC").Scan(&results)
 	return results
 }
 
@@ -46,26 +46,26 @@ func (c *errorLogService) GetAllErrors(model interface{}, hash string, offset in
 	return results
 }
 
-func (c *errorLogService) GetAllErrorsV2(model interface{}, hash string, start int, length int) []ErrorResults {
+func (c *errorLogService) GetAllErrorsV2(tableName, hash string, start int, length int) []ErrorResults {
 	var results []ErrorResults
-	if err := util.Master().Model(model).Where("hash = ?", hash).Order("id DESC").Limit(length).Offset(start).Scan(&results).Error; err != nil {
+	if err := util.Master().Table(tableName).Where("hash = ?", hash).Order("id DESC").Limit(length).Offset(start).Scan(&results).Error; err != nil {
 		milog.Error(err)
 		return nil
 	}
 	return results
 }
 
-func (c *errorLogService) GetAllErrorsTotalByHash(model interface{}, hash string) (total int64) {
-	if err := util.Master().Model(model).Where("hash = ?", hash).Count(&total).Error; err != nil {
+func (c *errorLogService) GetAllErrorsTotalByHash(tableName string, hash string) (total int64) {
+	if err := util.Master().Table(tableName).Where("hash = ?", hash).Count(&total).Error; err != nil {
 		milog.Error(err)
 		return 0
 	}
 	return total
 }
 
-func (c *errorLogService) GetTotalRecordService(model interface{}) int64 {
+func (c *errorLogService) GetTotalRecordService(tableName string) int64 {
 	var total int64
-	if err := util.Master().Model(model).Count(&total).Error; err != nil {
+	if err := util.Master().Table(tableName).Count(&total).Error; err != nil {
 		milog.Error(err)
 		return 0
 	}
