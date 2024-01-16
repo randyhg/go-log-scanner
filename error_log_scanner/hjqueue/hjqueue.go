@@ -68,8 +68,8 @@ func PatternedLogScanner(baseURL string, logName string, start time.Time, end ti
 						FailedAt: timestamp,
 						Hash:     &hash,
 					}
-					//db.Create(&queueLog)
 					db.Table(tableName).Create(&queueLog)
+					fmt.Println(logName, "successfully scanned")
 				}
 			} //else {
 			// 	fmt.Println(line)
@@ -82,7 +82,6 @@ func PatternedLogScanner(baseURL string, logName string, start time.Time, end ti
 		}
 
 	}
-	fmt.Println(logName, "successfully scanned")
 }
 
 func isScanned(fileName string, db *gorm.DB) (scanned bool, err error) {

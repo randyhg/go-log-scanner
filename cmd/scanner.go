@@ -69,56 +69,61 @@ func errorLogScanner(cmd *cobra.Command, args []string) {
 
 func scanAllLogs(db *gorm.DB) {
 	baseUrl := config.Instance.BaseURL
-	var wg sync.WaitGroup
-	wg.Add(30)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-10/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-11/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-22/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-33/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-44/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-51/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-52/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-53/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-71/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-72/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-73/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-74/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-75/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-76/", baseUrl), db, &wg)
 
-	// hjm3u8 scanner
-	go multipleUrlScanner(fmt.Sprintf("%s/hjm3u8/m3u801/", baseUrl), db, &wg)
+	for {
+		var wg sync.WaitGroup
+		wg.Add(30)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-10/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-11/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-22/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-33/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-44/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-51/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-52/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-53/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-71/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-72/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-73/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-74/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-75/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjapi/hj-api-log-76/", baseUrl), db, &wg)
 
-	// hjappserver scanner
-	go multipleUrlScanner(fmt.Sprintf("%s/hjappserver/hj-appserver-1/", baseUrl), db, &wg)
-	go multipleUrlScanner(fmt.Sprintf("%s/hjappserver/hj-appserver-2/", baseUrl), db, &wg)
+		// hjm3u8 scanner
+		go multipleUrlScanner(fmt.Sprintf("%s/hjm3u8/m3u801/", baseUrl), db, &wg)
 
-	// chatserver scanner
-	go multipleUrlScanner(fmt.Sprintf("%s/chatserver/", baseUrl), db, &wg)
+		// hjappserver scanner
+		go multipleUrlScanner(fmt.Sprintf("%s/hjappserver/hj-appserver-1/", baseUrl), db, &wg)
+		go multipleUrlScanner(fmt.Sprintf("%s/hjappserver/hj-appserver-2/", baseUrl), db, &wg)
 
-	// hjqueue scanner
-	yesterday := time.Now().AddDate(0, 0, -1)
-	defaultStart := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, time.UTC)
-	defaultEnd := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 23, 0, 0, 0, time.UTC)
-	hjqueueUrl := fmt.Sprintf("%s/hjqueue/", baseUrl)
-	go hjqueue.PatternedLogScanner(hjqueueUrl, "other-revenue", defaultStart, defaultEnd, db, &wg)
-	go hjqueue.PatternedLogScanner(hjqueueUrl, "topic-buy-stats", defaultStart, defaultEnd, db, &wg)
-	go hjqueue.PatternedLogScanner(hjqueueUrl, "topic-revenue", defaultStart, defaultEnd, db, &wg)
-	go hjqueue.PatternedLogScanner(hjqueueUrl, "update-topic-count", defaultStart, defaultEnd, db, &wg)
-	go hjqueue.PatternedLogScanner(hjqueueUrl, "video-add-view-count", defaultStart, defaultEnd, db, &wg)
-	go hjqueue.PatternedLogScanner(hjqueueUrl, "video-incr", defaultStart, defaultEnd, db, &wg)
-	go hjqueue.PatternedLogScanner(hjqueueUrl, "video-revenue", defaultStart, defaultEnd, db, &wg)
+		// chatserver scanner
+		go multipleUrlScanner(fmt.Sprintf("%s/chatserver/", baseUrl), db, &wg)
 
-	// =============================================================================
+		// hjqueue scanner
+		yesterday := time.Now().AddDate(0, 0, -1)
+		defaultStart := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, time.UTC)
+		defaultEnd := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 23, 0, 0, 0, time.UTC)
+		hjqueueUrl := fmt.Sprintf("%s/hjqueue/", baseUrl)
+		go hjqueue.PatternedLogScanner(hjqueueUrl, "other-revenue", defaultStart, defaultEnd, db, &wg)
+		go hjqueue.PatternedLogScanner(hjqueueUrl, "topic-buy-stats", defaultStart, defaultEnd, db, &wg)
+		go hjqueue.PatternedLogScanner(hjqueueUrl, "topic-revenue", defaultStart, defaultEnd, db, &wg)
+		go hjqueue.PatternedLogScanner(hjqueueUrl, "update-topic-count", defaultStart, defaultEnd, db, &wg)
+		go hjqueue.PatternedLogScanner(hjqueueUrl, "video-add-view-count", defaultStart, defaultEnd, db, &wg)
+		go hjqueue.PatternedLogScanner(hjqueueUrl, "video-incr", defaultStart, defaultEnd, db, &wg)
+		go hjqueue.PatternedLogScanner(hjqueueUrl, "video-revenue", defaultStart, defaultEnd, db, &wg)
 
-	// hjadmin scanner
-	go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-03.log", baseUrl), db, &wg)
-	go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-17.log", baseUrl), db, &wg)
-	go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-20.log", baseUrl), db, &wg)
-	go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-23.log", baseUrl), db, &wg)
-	go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-28.log", baseUrl), db, &wg)
+		// =============================================================================
 
-	wg.Wait()
+		// hjadmin scanner
+		go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-03.log", baseUrl), db, &wg)
+		go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-17.log", baseUrl), db, &wg)
+		go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-20.log", baseUrl), db, &wg)
+		go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-23.log", baseUrl), db, &wg)
+		go hjAdminValidation(fmt.Sprintf("%s/hjadmin/2023-11-28.log", baseUrl), db, &wg)
+
+		wg.Wait()
+		time.Sleep(10 * time.Second)
+		continue
+	}
 }
 
 func multipleUrlScanner(directoryURL string, db *gorm.DB, wg *sync.WaitGroup) {
